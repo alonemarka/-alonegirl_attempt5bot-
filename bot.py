@@ -18,8 +18,8 @@ groq = Groq(api_key=GROQ_API_KEY)
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🌍 **Metin Çeviri Botu**\n\n"
-        "İngilizce mesaj yaz, ben otomatik Türkçe'ye çevireyim.\n"
-        "Türkçe yazarsan dokunmayacağım.\n\n"
+        "İngilizce mesaj yaz → Ben Türkçe'ye çevireyim.\n"
+        "Türkçe yazarsan dokunmam.\n\n"
         "Hadi dene! ✨",
         parse_mode='Markdown'
     )
@@ -38,11 +38,11 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "role": "user",
                 "content": f"""
 Aşağıdaki mesaj İngilizce ise **mükemmel Türkçe**'ye çevir.
-Eğer zaten Türkçe ise veya başka dilde ise **hiçbir şey yapma**, aynı mesajı geri ver.
+Eğer zaten Türkçe ise olduğu gibi bırak.
 
 Mesaj: {text}
 
-Sadece çeviriyi ver, açıklama yazma.
+Sadece çeviriyi ver, ekstra açıklama yazma.
 """
             }],
             temperature=0.3,
@@ -51,14 +51,12 @@ Sadece çeviriyi ver, açıklama yazma.
 
         sonuc = response.choices[0].message.content.strip()
 
-        # Eğer çeviri değiştiyse (yani İngilizce idi) cevap ver
         if sonuc != text:
             await message.reply_text(f"**🇹🇷 Türkçe Çeviri:**\n{sonuc}")
-        # Türkçe ise sessiz kal
 
     except Exception as e:
         logger.error(e)
-        await message.reply_text("❌ Çeviri yapılırken hata oluştu.")
+        await message.reply_text("❌ Bir hata oluştu.")
 
 def main():
     app = Application.builder().token(TOKEN).build()
