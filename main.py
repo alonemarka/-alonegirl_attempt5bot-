@@ -13,14 +13,13 @@ logger = logging.getLogger(__name__)
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-# Groq client
 groq = Groq(api_key=GROQ_API_KEY)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🌍 **Metin Çeviri Botu**\n\n"
         "İngilizce mesaj yaz → Türkçe çeviririm\n"
-        "Türkçe yazarsan dokunmam\n\n"
+        "Türkçe yazarsan dokunmam.\n\n"
         "Hadi dene! ✨",
         parse_mode='Markdown'
     )
@@ -38,8 +37,8 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             messages=[{
                 "role": "user",
                 "content": f"""
-Aşağıdaki mesaj İngilizce ise akıcı ve doğal Türkçe'ye çevir.
-Eğer zaten Türkçe ise aynı bırak.
+Aşağıdaki mesaj İngilizce ise akıcı Türkçe'ye çevir. 
+Türkçe ise aynı bırak.
 
 Mesaj: {text}
 
@@ -56,20 +55,16 @@ Sadece çeviriyi ver, ekstra açıklama yazma.
             await message.reply_text(f"**🇹🇷 Türkçe Çeviri:**\n{sonuc}")
 
     except Exception as e:
-        logger.error(f"Hata: {e}")
-        await message.reply_text("❌ Çeviri sırasında hata oluştu.")
+        logger.error(e)
+        await message.reply_text("❌ Hata oluştu.")
 
 def main():
-    if not TOKEN or not GROQ_API_KEY:
-        logger.error("TOKEN veya GROQ_API_KEY eksik!")
-        return
-
     app = Application.builder().token(TOKEN).build()
     
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
-    logger.info("✅ Metin Çeviri Botu Pella'da aktif!")
+    logger.info("✅ Bot aktif!")
     app.run_polling()
 
 
